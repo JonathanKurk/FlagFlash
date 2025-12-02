@@ -12,57 +12,160 @@
     <link rel="apple-touch-icon" href="icon.png">
 
     <style>
-        /* --- COPY PASTE HIER DAS GLEICHE CSS WIE VORHER --- */
-        /* Ich kürze es hier ab, damit die Antwort nicht zu lang wird. 
-           Nimm exakt das CSS aus Version 3.0 von oben! */
+        /* --- THEME & BASE (Gleich wie vorher) --- */
         :root { --bg: #f4f4f5; --surface: #ffffff; --text: #18181b; --accent: #6366f1; --accent-fg: #ffffff; --border: #27272a; --success: #22c55e; --error: #ef4444; --radius: 12px; --shadow: 4px 4px 0px var(--border); --font: 'Inter', system-ui, sans-serif; }
         [data-theme="dark"] { --bg: #09090b; --surface: #18181b; --text: #f4f4f5; --accent: #818cf8; --accent-fg: #000000; --border: #f4f4f5; --shadow: 4px 4px 0px rgba(255,255,255,0.25); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: var(--font); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
+        
+        /* --- UI COMPONENTS --- */
         .container { width: 100%; max-width: 600px; margin: 0 auto; height: 100%; position: relative; padding: 20px; display: flex; flex-direction: column; }
         h1 { font-size: 2.5rem; line-height: 1; margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; letter-spacing: -1px; }
         p { opacity: 0.8; line-height: 1.5; }
+        
         .btn { background: var(--surface); color: var(--text); border: 2px solid var(--border); padding: 16px; font-size: 1rem; font-weight: 700; border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; cursor: pointer; margin-bottom: 12px; text-align: center; transition: 0.1s; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 transparent; }
         .btn-primary { background: var(--accent); color: var(--accent-fg); }
         .btn-sm { width: auto; display: inline-block; padding: 10px 16px; font-size: 0.9rem; margin-right: 8px;}
+        
         input, select { width: 100%; padding: 14px; background: var(--surface); border: 2px solid var(--border); color: var(--text); border-radius: var(--radius); font-size: 1rem; appearance: none; outline: none; font-family: var(--font); }
-        .screen { position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center; background: var(--bg); opacity: 0; pointer-events: none; transform: scale(0.98); transition: 0.3s ease; z-index: 1; }
+        
+        /* --- SCREENS --- */
+        .screen { position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; background: var(--bg); opacity: 0; pointer-events: none; transform: scale(0.98); transition: 0.3s ease; z-index: 1; }
         .screen.active { opacity: 1; pointer-events: all; transform: scale(1); z-index: 10; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding-bottom: 15px; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
-        .timer-wrap { width: 100%; height: 6px; background: var(--border); margin-bottom: 20px; border-radius: 3px; overflow: hidden; }
+        /* Center content specifically for these screens */
+        #screen-menu, #screen-result { justify-content: center; }
+
+        /* --- GAME UI --- */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding-bottom: 15px; border-bottom: 2px solid var(--border); margin-bottom: 20px; flex-shrink: 0;}
+        .timer-wrap { width: 100%; height: 6px; background: var(--border); margin-bottom: 20px; border-radius: 3px; overflow: hidden; flex-shrink: 0;}
         .timer-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left; }
-        .flag-box { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; position: relative; }
+        
+        .flag-box { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; position: relative; flex-shrink: 0;}
         .flag-img { width: 100%; height: 100%; object-fit: contain; display: none; }
         .flag-img.bw { filter: grayscale(100%); }
         .flag-img.inv { filter: invert(100%); }
         .msg-overlay { font-size: 3rem; font-weight: 900; z-index: 5; }
+        
         .input-area { opacity: 0; pointer-events: none; transform: translateY(20px); transition: 0.3s; display: flex; flex-direction: column; gap: 10px; }
         .input-area.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        /* --- STUDY MODE UI --- */
+        .study-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; flex-shrink: 0; }
+        .search-row { display: flex; gap: 10px; }
+        
+        .study-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 15px; 
+            overflow-y: auto; 
+            padding-bottom: 20px;
+            /* Hide Scrollbar but keep functionality */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .study-grid::-webkit-scrollbar { display: none; }
+
+        .study-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex; flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 2px 2px 0px var(--border);
+        }
+        .study-card img {
+            width: 100%; aspect-ratio: 3/2; object-fit: cover;
+            border-radius: 4px; border: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 8px;
+            background: #ddd;
+        }
+        .study-card span { font-size: 0.85rem; font-weight: 700; line-height: 1.2; word-break: break-word;}
+
     </style>
 </head>
 <body>
-    <!-- 
-       HIER DEN KOMPLETTEN HTML BODY INHALT AUS VERSION 3.0 EINFÜGEN 
-       (Die Divs .container, screens, buttons etc. - Alles gleich!)
-    -->
+
     <div class="container">
         <!-- MENU -->
         <div id="screen-menu" class="screen active">
             <h1>Flash<br>Flag</h1>
             <p style="margin-bottom: 20px;"><span data-i18n="hs">Highscore</span>: <span id="menu-hs">0</span></p>
-            <div style="margin-bottom: 20px;"><button class="btn btn-sm" id="lang-btn">DE | EN</button><button class="btn btn-sm" id="theme-btn">☀ | ☾</button></div>
-            <div style="margin-bottom: 15px;"><label data-i18n="region" style="font-weight:bold; display:block; margin-bottom:5px;">Region</label><select id="opt-region"><option value="all" data-i18n="all">Alle</option><option value="Europe" data-i18n="eur">Europa</option><option value="Asia" data-i18n="asia">Asien</option><option value="Africa" data-i18n="afr">Afrika</option><option value="Americas" data-i18n="ame">Amerika</option></select></div>
-            <div style="margin-bottom: 15px;"><label data-i18n="mode" style="font-weight:bold; display:block; margin-bottom:5px;">Modus</label><select id="opt-mode"><option value="normal">Normal</option><option value="bw">B&W</option><option value="invert">Inverted</option></select></div>
-            <div style="margin-bottom: 25px;"><label style="font-weight:bold; display:block; margin-bottom:5px;"><span data-i18n="time">Zeit</span>: <span id="time-display">1.0</span>s</label><input type="range" id="opt-time" min="0.1" max="3.0" step="0.1" value="1.0"></div>
+
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-sm" id="lang-btn">DE | EN</button>
+                <button class="btn btn-sm" id="theme-btn">☀ | ☾</button>
+            </div>
+
+            <!-- Settings -->
+            <div style="margin-bottom: 15px;">
+                <label data-i18n="region" style="font-weight:bold; display:block; margin-bottom:5px;">Region</label>
+                <select id="opt-region">
+                    <option value="all" data-i18n="all">Alle</option>
+                    <option value="Europe" data-i18n="eur">Europa</option>
+                    <option value="Asia" data-i18n="asia">Asien</option>
+                    <option value="Africa" data-i18n="afr">Afrika</option>
+                    <option value="Americas" data-i18n="ame">Amerika</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label data-i18n="mode" style="font-weight:bold; display:block; margin-bottom:5px;">Modus</label>
+                <select id="opt-mode">
+                    <option value="normal">Normal</option>
+                    <option value="bw">B&W</option>
+                    <option value="invert">Inverted</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;"><span data-i18n="time">Zeit</span>: <span id="time-display">1.0</span>s</label>
+                <input type="range" id="opt-time" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+
             <button class="btn btn-primary" id="start-btn" data-i18n="start">START</button>
+            <!-- NEW: Learn Button -->
+            <button class="btn" id="learn-btn" data-i18n="learn">LERNEN / ÜBERSICHT</button>
+            
             <div id="loading-msg" style="font-size:0.8rem; text-align:center; margin-top:10px;">API wird geladen...</div>
         </div>
+
+        <!-- NEW: LEARN SCREEN -->
+        <div id="screen-learn" class="screen">
+            <div class="top-bar">
+                <span data-i18n="learn_title">Lernen</span>
+                <button id="learn-back-btn" style="background:none; border:none; font-size:1.2rem; font-weight:bold; color:var(--text);">✕</button>
+            </div>
+
+            <div class="study-header">
+                <select id="study-region-select">
+                    <option value="all" data-i18n="all">Alle Welt</option>
+                    <option value="Europe" data-i18n="eur">Europa</option>
+                    <option value="Asia" data-i18n="asia">Asien</option>
+                    <option value="Africa" data-i18n="afr">Afrika</option>
+                    <option value="Americas" data-i18n="ame">Amerika</option>
+                </select>
+                <input type="text" id="study-search" placeholder="Suchen..." data-i18n="search_ph">
+            </div>
+
+            <div id="study-grid" class="study-grid">
+                <!-- Cards injected via JS -->
+            </div>
+        </div>
+
         <!-- GAME -->
         <div id="screen-game" class="screen">
-            <div class="top-bar"><span><span data-i18n="score">Punkte</span>: <span id="game-score">0</span></span><button id="quit-btn" style="background:none; border:none; font-size:1.2rem; font-weight:bold; color:var(--text);">✕</button></div>
+            <div class="top-bar">
+                <span><span data-i18n="score">Punkte</span>: <span id="game-score">0</span></span>
+                <button id="quit-btn" style="background:none; border:none; font-size:1.2rem; font-weight:bold; color:var(--text);">✕</button>
+            </div>
             <div class="timer-wrap"><div id="timer-bar" class="timer-fill"></div></div>
-            <div class="flag-box"><img id="game-flag" class="flag-img" src="" alt="?"><div id="game-msg" class="msg-overlay"></div></div>
+            <div class="flag-box">
+                <img id="game-flag" class="flag-img" src="" alt="?">
+                <div id="game-msg" class="msg-overlay"></div>
+            </div>
             <div id="input-container" class="input-area">
                 <label data-i18n="guess_label" style="font-size:0.9rem; font-weight:bold;">Welches Land war das?</label>
                 <input type="text" id="guess-input" list="country-list" placeholder="..." autocomplete="off">
@@ -70,6 +173,7 @@
                 <button class="btn btn-primary" id="submit-btn">OK</button>
             </div>
         </div>
+
         <!-- RESULT -->
         <div id="screen-result" class="screen">
             <h1 data-i18n="gameover">GAME OVER</h1>
@@ -78,39 +182,279 @@
                 <div id="new-record-msg" style="color: var(--success); font-weight:bold; display:none;">NEW RECORD!</div>
                 <p style="margin:0; opacity:0.6;"><span data-i18n="hs">Highscore</span>: <span id="end-hs">0</span></p>
             </div>
-            <p style="margin-bottom: 5px;" data-i18n="correct_was">Das war:</p><h3 id="correct-answer-name" style="margin-top:0; color: var(--accent); text-transform:uppercase;">Name</h3>
-            <button class="btn btn-primary" id="restart-btn" data-i18n="again">NOCHMAL</button><button class="btn" id="menu-btn" data-i18n="menu">MENÜ</button>
+            <p style="margin-bottom: 5px;" data-i18n="correct_was">Das war:</p>
+            <h3 id="correct-answer-name" style="margin-top:0; color: var(--accent); text-transform:uppercase;">Name</h3>
+            <button class="btn btn-primary" id="restart-btn" data-i18n="again">NOCHMAL</button>
+            <button class="btn" id="menu-btn" data-i18n="menu">MENÜ</button>
         </div>
     </div>
 
-    <!-- HIER DAS SKRIPT AUS VERSION 3.0 EINFÜGEN (EXAKT GLEICH) -->
     <script>
-        // ... (Füge hier den kompletten JS Code von vorhin ein) ...
-        const i18n={de:{hs:"Rekord",region:"Region",all:"Alle Welt",eur:"Europa",asia:"Asien",afr:"Afrika",ame:"Amerika",mode:"Farbmodus",time:"Sichtbarkeit",start:"STARTEN",score:"Punkte",guess_label:"Land eingeben...",gameover:"GAME OVER",correct_was:"Richtig war:",again:"NOCHMAL",menu:"HAUPTMENÜ"},en:{hs:"Highscore",region:"Region",all:"World",eur:"Europe",asia:"Asia",afr:"Africa",ame:"Americas",mode:"Color Mode",time:"Visibility",start:"START GAME",score:"Score",guess_label:"Type country name...",gameover:"GAME OVER",correct_was:"It was:",again:"PLAY AGAIN",menu:"MAIN MENU"}};
-        let appState={lang:'de',theme:'light',data:[],pool:[],score:0,highscore:parseInt(localStorage.getItem('ff_highscore'))||0,currentCountry:null,gameActive:false};
-        const $=(id)=>document.getElementById(id);const screens={menu:$('screen-menu'),game:$('screen-game'),result:$('screen-result')};
-        async function init(){$('menu-hs').innerText=appState.highscore;updateTexts();try{const res=await fetch("https://restcountries.com/v3.1/all?fields=name,flags,region,cca2,translations");appState.data=await res.json();$('loading-msg').style.display='none';}catch(e){$('loading-msg').innerText="Offline Modus aktiv (oder Fehler).";}}
-        function switchScreen(name){Object.values(screens).forEach(s=>s.classList.remove('active'));screens[name].classList.add('active');}
-        function updateTexts(){const dict=i18n[appState.lang];document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(dict[key])el.innerText=dict[key];});$('guess-input').placeholder=dict.guess_label;}
-        function toggleLang(){appState.lang=appState.lang==='de'?'en':'de';updateTexts();}
-        function startGame(){if(appState.data.length===0)return alert("Daten laden noch (oder du bist offline ohne Cache).");const region=$('opt-region').value;appState.pool=appState.data.filter(c=>region==='all'||c.region===region);if(appState.pool.length===0)return alert("Fehler beim Laden der Region.");appState.score=0;$('game-score').innerText="0";appState.gameActive=true;const mode=$('opt-mode').value;$('game-flag').className='flag-img';if(mode==='bw')$('game-flag').classList.add('bw');if(mode==='invert')$('game-flag').classList.add('inv');const datalist=$('country-list');datalist.innerHTML='';appState.pool.forEach(c=>{const opt=document.createElement('option');opt.value=getName(c);datalist.appendChild(opt);});switchScreen('game');nextRound();}
-        function getName(country){if(appState.lang==='de'&&country.translations&&country.translations.deu){return country.translations.deu.common;}return country.name.common;}
-        function nextRound(){$('input-container').classList.remove('visible');$('guess-input').value='';$('game-flag').style.display='none';$('timer-bar').style.transition='none';$('timer-bar').style.transform='scaleX(1)';const randIndex=Math.floor(Math.random()*appState.pool.length);appState.currentCountry=appState.pool[randIndex];$('game-msg').innerText="Loading...";$('game-msg').style.display='block';$('game-flag').src=appState.currentCountry.flags.svg;$('game-flag').onload=()=>startCountdown();}
-        function startCountdown(){let count=3;$('game-msg').innerText=count;const intv=setInterval(()=>{count--;if(count>0)$('game-msg').innerText=count;else{clearInterval(intv);flashFlag();}},600);}
-        function flashFlag(){$('game-msg').style.display='none';$('game-flag').style.display='block';const time=parseFloat($('opt-time').value);setTimeout(()=>{$('timer-bar').style.transition=`transform ${time}s linear`;$('timer-bar').style.transform='scaleX(0)';},50);setTimeout(()=>{$('game-flag').style.display='none';showInput();},time*1000);}
-        function showInput(){$('input-container').classList.add('visible');$('guess-input').focus();}
-        function submitGuess(){if(!appState.gameActive)return;const userVal=$('guess-input').value.trim().toLowerCase();const correctName=getName(appState.currentCountry).toLowerCase();if(userVal===correctName){appState.score++;$('game-score').innerText=appState.score;nextRound();}else{gameOver();}}
-        function gameOver(){appState.gameActive=false;$('end-score').innerText=appState.score;$('correct-answer-name').innerText=getName(appState.currentCountry);let newRecord=false;if(appState.score>appState.highscore){appState.highscore=appState.score;localStorage.setItem('ff_highscore',appState.highscore);newRecord=true;}$('end-hs').innerText=appState.highscore;$('menu-hs').innerText=appState.highscore;$('new-record-msg').style.display=newRecord?'block':'none';switchScreen('result');}
-        $('lang-btn').onclick=toggleLang;$('theme-btn').onclick=()=>{const isDark=document.body.getAttribute('data-theme')==='dark';document.body.setAttribute('data-theme',isDark?'':'dark');};$('opt-time').oninput=(e)=>$('time-display').innerText=parseFloat(e.target.value).toFixed(1);$('start-btn').onclick=startGame;$('restart-btn').onclick=startGame;$('menu-btn').onclick=()=>switchScreen('menu');$('quit-btn').onclick=()=>switchScreen('menu');$('submit-btn').onclick=submitGuess;$('guess-input').addEventListener("keypress",function(event){if(event.key==="Enter")submitGuess();});init();
+        // --- TRANSLATIONS ---
+        const i18n = {
+            de: {
+                hs: "Rekord", region: "Region", all: "Alle Welt", eur: "Europa", asia: "Asien", afr: "Afrika", ame: "Amerika",
+                mode: "Farbmodus", time: "Sichtbarkeit", start: "QUIZ STARTEN", learn: "LERNEN / ÜBERSICHT",
+                score: "Punkte", guess_label: "Land eingeben...", gameover: "GAME OVER", 
+                correct_was: "Richtig war:", again: "NOCHMAL", menu: "HAUPTMENÜ",
+                learn_title: "Alle Flaggen", search_ph: "Suchen..."
+            },
+            en: {
+                hs: "Highscore", region: "Region", all: "World", eur: "Europe", asia: "Asia", afr: "Africa", ame: "Americas",
+                mode: "Color Mode", time: "Visibility", start: "START QUIZ", learn: "STUDY / LIST",
+                score: "Score", guess_label: "Type country name...", gameover: "GAME OVER", 
+                correct_was: "It was:", again: "PLAY AGAIN", menu: "MAIN MENU",
+                learn_title: "All Flags", search_ph: "Search..."
+            }
+        };
 
-        // --- PWA SERVICE WORKER REGISTRIERUNG ---
+        // --- STATE ---
+        let appState = {
+            lang: 'de',
+            data: [],
+            pool: [],
+            score: 0,
+            highscore: parseInt(localStorage.getItem('ff_highscore')) || 0,
+            currentCountry: null,
+            gameActive: false
+        };
+
+        // --- DOM HELPER ---
+        const $ = (id) => document.getElementById(id);
+        const screens = { menu: $('screen-menu'), game: $('screen-game'), result: $('screen-result'), learn: $('screen-learn') };
+
+        // --- INIT ---
+        async function init() {
+            $('menu-hs').innerText = appState.highscore;
+            updateTexts();
+            try {
+                const res = await fetch("https://restcountries.com/v3.1/all?fields=name,flags,region,cca2,translations");
+                appState.data = await res.json();
+                $('loading-msg').style.display = 'none';
+            } catch (e) {
+                $('loading-msg').innerText = "Offline Modus aktiv (oder Fehler).";
+            }
+        }
+
+        // --- CORE FUNCTIONS ---
+        function switchScreen(name) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[name].classList.add('active');
+        }
+
+        function updateTexts() {
+            const dict = i18n[appState.lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(dict[key]) el.innerText = dict[key];
+            });
+            $('guess-input').placeholder = dict.guess_label || "...";
+            $('study-search').placeholder = dict.search_ph || "...";
+        }
+
+        function toggleLang() {
+            appState.lang = appState.lang === 'de' ? 'en' : 'de';
+            updateTexts();
+            // If in learn mode, re-render to update names
+            if(screens.learn.classList.contains('active')) renderStudy();
+        }
+
+        function getName(country) {
+            if(appState.lang === 'de' && country.translations && country.translations.deu) {
+                return country.translations.deu.common;
+            }
+            return country.name.common;
+        }
+
+        // --- GAME LOGIC ---
+        function startGame() {
+            if(appState.data.length === 0) return alert("Daten laden noch (oder Offline ohne Cache).");
+            const region = $('opt-region').value;
+            appState.pool = appState.data.filter(c => region === 'all' || c.region === region);
+            if(appState.pool.length === 0) return alert("Region leer.");
+
+            appState.score = 0;
+            $('game-score').innerText = "0";
+            appState.gameActive = true;
+
+            const mode = $('opt-mode').value;
+            $('game-flag').className = 'flag-img'; 
+            if(mode === 'bw') $('game-flag').classList.add('bw');
+            if(mode === 'invert') $('game-flag').classList.add('inv');
+
+            // Setup Autocomplete
+            const datalist = $('country-list');
+            datalist.innerHTML = '';
+            appState.pool.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = getName(c);
+                datalist.appendChild(opt);
+            });
+
+            switchScreen('game');
+            nextRound();
+        }
+
+        function nextRound() {
+            $('input-container').classList.remove('visible');
+            $('guess-input').value = '';
+            $('game-flag').style.display = 'none';
+            $('timer-bar').style.transition = 'none';
+            $('timer-bar').style.transform = 'scaleX(1)';
+
+            const randIndex = Math.floor(Math.random() * appState.pool.length);
+            appState.currentCountry = appState.pool[randIndex];
+
+            $('game-msg').innerText = "Ready"; // Placeholder for loading
+            $('game-msg').style.display = 'block';
+            $('game-flag').src = appState.currentCountry.flags.svg;
+            
+            $('game-flag').onload = () => startCountdown();
+        }
+
+        function startCountdown() {
+            let count = 3;
+            $('game-msg').innerText = count;
+            const intv = setInterval(() => {
+                count--;
+                if(count > 0) $('game-msg').innerText = count;
+                else {
+                    clearInterval(intv);
+                    flashFlag();
+                }
+            }, 600);
+        }
+
+        function flashFlag() {
+            $('game-msg').style.display = 'none';
+            $('game-flag').style.display = 'block';
+            const time = parseFloat($('opt-time').value);
+            
+            setTimeout(() => {
+                $('timer-bar').style.transition = `transform ${time}s linear`;
+                $('timer-bar').style.transform = 'scaleX(0)';
+            }, 50);
+
+            setTimeout(() => {
+                $('game-flag').style.display = 'none';
+                showInput();
+            }, time * 1000);
+        }
+
+        function showInput() {
+            $('input-container').classList.add('visible');
+            $('guess-input').focus();
+        }
+
+        function submitGuess() {
+            if(!appState.gameActive) return;
+            const userVal = $('guess-input').value.trim().toLowerCase();
+            const correctName = getName(appState.currentCountry).toLowerCase();
+
+            if(userVal === correctName) {
+                appState.score++;
+                $('game-score').innerText = appState.score;
+                nextRound();
+            } else {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            appState.gameActive = false;
+            $('end-score').innerText = appState.score;
+            $('correct-answer-name').innerText = getName(appState.currentCountry);
+            
+            let newRecord = false;
+            if(appState.score > appState.highscore) {
+                appState.highscore = appState.score;
+                localStorage.setItem('ff_highscore', appState.highscore);
+                newRecord = true;
+            }
+            $('end-hs').innerText = appState.highscore;
+            $('menu-hs').innerText = appState.highscore;
+            $('new-record-msg').style.display = newRecord ? 'block' : 'none';
+            switchScreen('result');
+        }
+
+        // --- STUDY MODE LOGIC ---
+        function openStudy() {
+            if(appState.data.length === 0) return alert("Daten noch nicht geladen.");
+            switchScreen('learn');
+            renderStudy();
+        }
+
+        function renderStudy() {
+            const grid = $('study-grid');
+            grid.innerHTML = '';
+            
+            const region = $('study-region-select').value;
+            const search = $('study-search').value.toLowerCase();
+
+            // Filter
+            const list = appState.data.filter(c => {
+                const name = getName(c).toLowerCase();
+                const matchesRegion = (region === 'all' || c.region === region);
+                const matchesSearch = name.includes(search);
+                return matchesRegion && matchesSearch;
+            });
+            
+            // Sort A-Z
+            list.sort((a, b) => getName(a).localeCompare(getName(b)));
+
+            // Render
+            // Performance Tip: Creating Fragment
+            const frag = document.createDocumentFragment();
+            list.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'study-card';
+                
+                const img = document.createElement('img');
+                img.loading = 'lazy'; // Important for performance!
+                img.src = c.flags.svg;
+                
+                const span = document.createElement('span');
+                span.innerText = getName(c);
+
+                div.appendChild(img);
+                div.appendChild(span);
+                frag.appendChild(div);
+            });
+            grid.appendChild(frag);
+        }
+
+        // --- EVENT BINDINGS ---
+        $('lang-btn').onclick = toggleLang;
+        $('theme-btn').onclick = () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+        };
+        $('opt-time').oninput = (e) => $('time-display').innerText = parseFloat(e.target.value).toFixed(1);
+
+        $('start-btn').onclick = startGame;
+        $('restart-btn').onclick = startGame;
+        $('menu-btn').onclick = () => switchScreen('menu');
+        $('quit-btn').onclick = () => switchScreen('menu');
+
+        // Game Input
+        $('submit-btn').onclick = submitGuess;
+        $('guess-input').addEventListener("keypress", (e) => { if (e.key === "Enter") submitGuess(); });
+
+        // Learn Mode
+        $('learn-btn').onclick = openStudy;
+        $('learn-back-btn').onclick = () => switchScreen('menu');
+        $('study-region-select').onchange = renderStudy;
+        $('study-search').oninput = renderStudy;
+
+        // PWA Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registriert'))
-                    .catch(err => console.log('Service Worker Fehler:', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
             });
         }
+
+        // Start
+        init();
     </script>
 </body>
 </html>

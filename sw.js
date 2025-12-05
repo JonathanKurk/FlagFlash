@@ -1,49 +1,57 @@
-const CACHE_NAME = 'flashflag-v1';
-const ASSETS_TO_CACHE = [
-    './',
-    './index.html',
-    './manifest.json',
-    './icon.png'
+const CACHE_NAME = 'flashflag-neo-v1';
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.png'
 ];
 
-// 1. Installieren und statische Dateien cachen
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
+// Install: Cache core files
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
 
-// 2. Anfragen abfangen (Offline Logik)
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            // Wenn im Cache, nimm es (z.B. index.html oder bereits geladene Flagge)
-            if (cachedResponse) {
-                return cachedResponse;
+// Fetch: Serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        // Clone request
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(
+          response => {
+            // Check if valid
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              // Allows cross-origin images (flags) to be loaded but maybe not cached via 'basic' check
+              // Removing 'basic' check allows opaque responses (like flags from other domains)
+              if (response.type === 'opaque') {
+                 // Cache opaque responses (flag images)
+              } else {
+                 // Standard check
+              }
             }
 
-            // Wenn nicht im Cache, lade es aus dem Internet
-            return fetch(event.request).then((networkResponse) => {
-                // Nur gültige Antworten cachen
-                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && !event.request.url.includes('flags')) {
-                    return networkResponse;
+            // Cache new requests (like flag images) dynamically
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                // Nur http/https requests cachen, keine chrome-extensions
+                if(event.request.url.startsWith('http')) {
+                    cache.put(event.request, responseToCache);
                 }
+              });
 
-                // API und Flaggenbilder in den Cache klonen für später
-                if(event.request.url.includes('restcountries') || event.request.url.includes('flag')) {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
-                    });
-                }
-
-                return networkResponse;
-            }).catch(() => {
-                // Falls Offline und nicht im Cache: Pech gehabt (oder Platzhalter anzeigen)
-                console.log("Offline und nicht im Cache:", event.request.url);
-            });
-        })
-    );
+            return response;
+          }
+        );
+      })
+  );
 });

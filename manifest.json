@@ -1,10 +1,10 @@
 {
-  "name": "FlashFlag Quiz",
+  "name": "FlashFlag Neo",
   "short_name": "FlashFlag",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#f4f4f5",
-  "theme_color": "#6366f1",
+  "background_color": "#111111",
+  "theme_color": "#111111",
   "icons": [
     {
       "src": "icon.png",

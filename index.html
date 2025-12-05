@@ -3,457 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#f4f4f5">
-    <meta name="description" content="Ultimatives Flaggen Quiz - Offline spielbar">
-    <title>FlashFlag Ultimate</title>
+    <meta name="theme-color" content="#111111">
+    <meta name="description" content="FlashFlag Neo - Das ultimative Flaggen Quiz">
+    <meta name="mobile-web-app-capable" content="yes">
     
-    <!-- PWA Verknüpfung -->
+    <!-- Verweis auf Manifest -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png"> 
 
+    <title>FlashFlag Neo</title>
+    
     <style>
-        /* --- THEME & BASE (Gleich wie vorher) --- */
-        :root { --bg: #f4f4f5; --surface: #ffffff; --text: #18181b; --accent: #6366f1; --accent-fg: #ffffff; --border: #27272a; --success: #22c55e; --error: #ef4444; --radius: 12px; --shadow: 4px 4px 0px var(--border); --font: 'Inter', system-ui, sans-serif; }
-        [data-theme="dark"] { --bg: #09090b; --surface: #18181b; --text: #f4f4f5; --accent: #818cf8; --accent-fg: #000000; --border: #f4f4f5; --shadow: 4px 4px 0px rgba(255,255,255,0.25); }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: var(--font); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
-        
-        /* --- UI COMPONENTS --- */
-        .container { width: 100%; max-width: 600px; margin: 0 auto; height: 100%; position: relative; padding: 20px; display: flex; flex-direction: column; }
-        h1 { font-size: 2.5rem; line-height: 1; margin: 0 0 10px 0; text-transform: uppercase; font-weight: 900; letter-spacing: -1px; }
-        p { opacity: 0.8; line-height: 1.5; }
-        
-        .btn { background: var(--surface); color: var(--text); border: 2px solid var(--border); padding: 16px; font-size: 1rem; font-weight: 700; border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; cursor: pointer; margin-bottom: 12px; text-align: center; transition: 0.1s; }
-        .btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 transparent; }
-        .btn-primary { background: var(--accent); color: var(--accent-fg); }
-        .btn-sm { width: auto; display: inline-block; padding: 10px 16px; font-size: 0.9rem; margin-right: 8px;}
-        
-        input, select { width: 100%; padding: 14px; background: var(--surface); border: 2px solid var(--border); color: var(--text); border-radius: var(--radius); font-size: 1rem; appearance: none; outline: none; font-family: var(--font); }
-        
-        /* --- SCREENS --- */
-        .screen { position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; background: var(--bg); opacity: 0; pointer-events: none; transform: scale(0.98); transition: 0.3s ease; z-index: 1; }
-        .screen.active { opacity: 1; pointer-events: all; transform: scale(1); z-index: 10; }
-        /* Center content specifically for these screens */
-        #screen-menu, #screen-result { justify-content: center; }
+        /* --- NEOBRUTALISM THEME --- */
+        :root { 
+            --bg: #f3f4f6; --surface: #ffffff; --text: #000000; --border: #000000; --shadow-col: #000000;
+            --accent: #2DD4BF; --error: #ff4757;
+            --border-width: 3px; --radius: 10px;
+            --font-head: 'Impact', 'Arial Black', sans-serif;
+            --font-body: system-ui, -apple-system, sans-serif;
+        }
+        [data-theme="dark"] { 
+            --bg: #111111; --surface: #111111; --text: #ffffff; --border: #ffffff; --shadow-col: #ffffff;
+            --accent: #2DD4BF; --error: #ff6b81;
+        }
 
-        /* --- GAME UI --- */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding-bottom: 15px; border-bottom: 2px solid var(--border); margin-bottom: 20px; flex-shrink: 0;}
-        .timer-wrap { width: 100%; height: 6px; background: var(--border); margin-bottom: 20px; border-radius: 3px; overflow: hidden; flex-shrink: 0;}
-        .timer-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .flag-box { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; position: relative; flex-shrink: 0;}
-        .flag-img { width: 100%; height: 100%; object-fit: contain; display: none; }
+        body { 
+            margin: 0; padding: 0; background-color: var(--bg); color: var(--text); 
+            font-family: var(--font-body); height: 100dvh; display: flex; flex-direction: column; 
+            overflow: hidden; transition: background 0.3s, color 0.3s;
+        }
+        
+        h1 { 
+            font-family: var(--font-head); font-size: 3.5rem; margin: 10px 0 20px 0; 
+            text-transform: uppercase; letter-spacing: 2px; text-align: center;
+            -webkit-text-stroke: 1px var(--bg); text-shadow: 3px 3px 0px var(--shadow-col);
+        }
+        
+        h3 {
+            font-family: var(--font-head); text-transform: uppercase; font-size: 1.5rem;
+            margin: 0 0 10px 0; letter-spacing: 1px; border-bottom: var(--border-width) solid var(--border);
+            display: inline-block;
+        }
+
+        .container { width: 100%; max-width: 600px; margin: 0 auto; height: 100%; padding: 15px; display: flex; flex-direction: column; position: relative;}
+        
+        /* Box Styles */
+        .neo-box {
+            background: var(--surface); border: var(--border-width) solid var(--border);
+            border-radius: var(--radius); box-shadow: 4px 4px 0px var(--shadow-col);
+            padding: 15px; margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .btn { 
+            background: var(--surface); color: var(--text); border: var(--border-width) solid var(--border); 
+            padding: 12px; font-family: var(--font-head); font-size: 1.1rem; border-radius: var(--radius); 
+            box-shadow: 4px 4px 0px var(--shadow-col); cursor: pointer; transition: transform 0.1s;
+            text-transform: uppercase; display: flex; justify-content: center; align-items: center;
+        }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--shadow-col); }
+        .btn-learn { background: var(--accent); color: #000; width: 100%; font-size: 1.2rem; margin-bottom: 25px; }
+        .btn-icon { width: 40px; height: 40px; padding: 0; margin-left: 10px;}
+
+        /* --- INPUTS & SLIDER CONSISTENCY --- */
+        .neo-input-style {
+            background: var(--surface); color: var(--text); border: var(--border-width) solid var(--border);
+            border-radius: 6px; height: 50px; width: 100%; font-weight: bold; font-size: 1rem;
+            outline: none; display: flex; align-items: center; box-shadow: none;
+        }
+
+        select.neo-input-style {
+            padding: 0 10px; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 12px auto;
+        }
+        [data-theme="dark"] select.neo-input-style {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        }
+
+        .slider-wrapper { padding: 0 10px; }
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; margin: 0; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--text); border-radius: 3px; cursor: pointer; opacity: 0.3; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 24px; width: 24px; border: 2px solid var(--text); border-radius: 50%;
+            background: var(--bg); cursor: pointer; margin-top: -9px; box-shadow: 1px 1px 0px var(--text);
+        }
+
+        /* --- SCREENS --- */
+        .screen { position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; background: var(--bg); opacity: 0; pointer-events: none; transform: scale(0.98); transition: 0.3s ease; z-index: 1; overflow-y: auto;}
+        .screen.active { opacity: 1; pointer-events: all; transform: scale(1); z-index: 10; }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;}
+        .setting-label { font-family: var(--font-head); font-size: 0.9rem; margin-bottom: 8px; display: block; letter-spacing: 0.5px;}
+
+        .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 30px; }
+        .level-card {
+            background: var(--surface); border: var(--border-width) solid var(--border); border-radius: var(--radius);
+            box-shadow: 5px 5px 0px var(--shadow-col); padding: 15px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer; position: relative;
+        }
+        .level-card:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0px var(--shadow-col); }
+        .level-icon { width: 80px; height: 55px; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--border); }
+        .level-title { font-family: var(--font-head); font-size: 1rem; text-align: center; line-height: 1; }
+
+        /* Game UI */
+        .top-bar { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: var(--surface); border: var(--border-width) solid var(--border);
+            padding: 10px 15px; border-radius: var(--radius); margin-bottom: 15px;
+            box-shadow: 3px 3px 0 var(--shadow-col);
+        }
+        .lives { font-size: 1.5rem; letter-spacing: 2px; }
+        .timer-wrap { width: 100%; height: 10px; border: 2px solid var(--border); margin-bottom: 20px; border-radius: 5px; overflow: hidden; background: var(--surface); }
+        .timer-fill { width: 100%; height: 100%; background: var(--accent); transform-origin: left; }
+        .flag-frame {
+            border: var(--border-width) solid var(--border); background: var(--surface);
+            box-shadow: 6px 6px 0 var(--shadow-col); border-radius: var(--radius); aspect-ratio: 16/9;
+            display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 20px; position: relative;
+        }
+        .flag-img { width: 100%; height: 100%; object-fit: contain; }
         .flag-img.bw { filter: grayscale(100%); }
         .flag-img.inv { filter: invert(100%); }
-        .msg-overlay { font-size: 3rem; font-weight: 900; z-index: 5; }
+        .countdown { font-family: var(--font-head); font-size: 5rem; -webkit-text-stroke: 2px var(--bg); z-index: 5; text-shadow: 4px 4px 0 var(--shadow-col); }
         
-        .input-area { opacity: 0; pointer-events: none; transform: translateY(20px); transition: 0.3s; display: flex; flex-direction: column; gap: 10px; }
+        .input-area { opacity: 0; pointer-events: none; transform: translateY(10px); transition: 0.3s; display: flex; flex-direction: column; gap: 10px; }
         .input-area.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
-
-        /* --- STUDY MODE UI --- */
-        .study-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; flex-shrink: 0; }
-        .search-row { display: flex; gap: 10px; }
         
-        .study-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-            gap: 15px; 
-            overflow-y: auto; 
-            padding-bottom: 20px;
-            /* Hide Scrollbar but keep functionality */
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
+        input[type="text"] {
+            background: var(--surface); color: var(--text); border: var(--border-width) solid var(--border);
+            border-radius: 6px; padding: 12px; font-weight: bold; font-size: 1rem; width: 100%; outline: none;
         }
-        .study-grid::-webkit-scrollbar { display: none; }
 
-        .study-card {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            padding: 10px;
-            display: flex; flex-direction: column;
-            align-items: center;
-            text-align: center;
-            box-shadow: 2px 2px 0px var(--border);
-        }
-        .study-card img {
-            width: 100%; aspect-ratio: 3/2; object-fit: cover;
-            border-radius: 4px; border: 1px solid rgba(0,0,0,0.1);
-            margin-bottom: 8px;
-            background: #ddd;
-        }
-        .study-card span { font-size: 0.85rem; font-weight: 700; line-height: 1.2; word-break: break-word;}
-
+        .study-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .study-card { border: 2px solid var(--border); background: var(--surface); padding: 8px; border-radius: 8px; text-align: center; }
+        .study-card img { width: 100%; aspect-ratio: 3/2; object-fit: cover; border: 1px solid var(--border); margin-bottom: 5px; }
+        .study-card span { font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <div class="container">
         <!-- MENU -->
         <div id="screen-menu" class="screen active">
-            <h1>Flash<br>Flag</h1>
-            <p style="margin-bottom: 20px;"><span data-i18n="hs">Highscore</span>: <span id="menu-hs">0</span></p>
-
-            <div style="margin-bottom: 20px;">
-                <button class="btn btn-sm" id="lang-btn">DE | EN</button>
-                <button class="btn btn-sm" id="theme-btn">☀ | ☾</button>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button class="btn btn-icon" id="lang-btn">DE</button>
+                <button class="btn btn-icon" id="theme-btn">☀</button>
             </div>
 
-            <!-- Settings -->
-            <div style="margin-bottom: 15px;">
-                <label data-i18n="region" style="font-weight:bold; display:block; margin-bottom:5px;">Region</label>
-                <select id="opt-region">
-                    <option value="all" data-i18n="all">Alle</option>
-                    <option value="Europe" data-i18n="eur">Europa</option>
-                    <option value="Asia" data-i18n="asia">Asien</option>
-                    <option value="Africa" data-i18n="afr">Afrika</option>
-                    <option value="Americas" data-i18n="ame">Amerika</option>
-                </select>
+            <h1>Flash Flag</h1>
+
+            <div class="neo-box">
+                <div class="settings-grid">
+                    <div>
+                        <label class="setting-label">MODUS</label>
+                        <select id="opt-mode" class="neo-input-style">
+                            <option value="normal">Normal</option>
+                            <option value="bw">B & W</option>
+                            <option value="invert">Invertiert</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="setting-label">ZEIT: <span id="time-txt">0.1s</span></label>
+                        <div class="neo-input-style slider-wrapper">
+                            <input type="range" id="opt-time" min="0.1" max="3.0" step="0.1" value="0.1">
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label data-i18n="mode" style="font-weight:bold; display:block; margin-bottom:5px;">Modus</label>
-                <select id="opt-mode">
-                    <option value="normal">Normal</option>
-                    <option value="bw">B&W</option>
-                    <option value="invert">Inverted</option>
-                </select>
-            </div>
+            <button class="btn btn-learn" id="open-learn-btn">📖 Alle Flaggen Lernen</button>
 
-            <div style="margin-bottom: 25px;">
-                <label style="font-weight:bold; display:block; margin-bottom:5px;"><span data-i18n="time">Zeit</span>: <span id="time-display">1.0</span>s</label>
-                <input type="range" id="opt-time" min="0.1" max="3.0" step="0.1" value="1.0">
-            </div>
-
-            <button class="btn btn-primary" id="start-btn" data-i18n="start">START</button>
-            <!-- NEW: Learn Button -->
-            <button class="btn" id="learn-btn" data-i18n="learn">LERNEN / ÜBERSICHT</button>
-            
-            <div id="loading-msg" style="font-size:0.8rem; text-align:center; margin-top:10px;">API wird geladen...</div>
-        </div>
-
-        <!-- NEW: LEARN SCREEN -->
-        <div id="screen-learn" class="screen">
-            <div class="top-bar">
-                <span data-i18n="learn_title">Lernen</span>
-                <button id="learn-back-btn" style="background:none; border:none; font-size:1.2rem; font-weight:bold; color:var(--text);">✕</button>
-            </div>
-
-            <div class="study-header">
-                <select id="study-region-select">
-                    <option value="all" data-i18n="all">Alle Welt</option>
-                    <option value="Europe" data-i18n="eur">Europa</option>
-                    <option value="Asia" data-i18n="asia">Asien</option>
-                    <option value="Africa" data-i18n="afr">Afrika</option>
-                    <option value="Americas" data-i18n="ame">Amerika</option>
-                </select>
-                <input type="text" id="study-search" placeholder="Suchen..." data-i18n="search_ph">
-            </div>
-
-            <div id="study-grid" class="study-grid">
-                <!-- Cards injected via JS -->
-            </div>
+            <h3>Levels</h3>
+            <div id="loading-msg">Lade Daten...</div>
+            <div id="level-list" class="level-grid"></div>
         </div>
 
         <!-- GAME -->
         <div id="screen-game" class="screen">
             <div class="top-bar">
-                <span><span data-i18n="score">Punkte</span>: <span id="game-score">0</span></span>
-                <button id="quit-btn" style="background:none; border:none; font-size:1.2rem; font-weight:bold; color:var(--text);">✕</button>
+                <div class="lives" id="lives-display">❤️❤️❤️</div>
+                <div style="font-family: var(--font-head); font-size: 1.2rem;">
+                    <span data-i18n="score">SCORE</span>: <span id="game-score">0</span>
+                </div>
+                <button id="quit-btn" style="background:var(--error); border:2px solid var(--border); color:white; font-weight:bold; cursor:pointer; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
             </div>
             <div class="timer-wrap"><div id="timer-bar" class="timer-fill"></div></div>
-            <div class="flag-box">
+            <div class="flag-frame">
                 <img id="game-flag" class="flag-img" src="" alt="?">
-                <div id="game-msg" class="msg-overlay"></div>
+                <div id="game-msg" class="countdown"></div>
             </div>
             <div id="input-container" class="input-area">
-                <label data-i18n="guess_label" style="font-size:0.9rem; font-weight:bold;">Welches Land war das?</label>
+                <label data-i18n="guess_label" style="font-family: var(--font-head);">LAND EINGEBEN:</label>
                 <input type="text" id="guess-input" list="country-list" placeholder="..." autocomplete="off">
                 <datalist id="country-list"></datalist>
-                <button class="btn btn-primary" id="submit-btn">OK</button>
+                <button class="btn" style="background:var(--accent); color:black; margin-top:10px;" id="submit-btn">OK</button>
             </div>
         </div>
 
         <!-- RESULT -->
-        <div id="screen-result" class="screen">
-            <h1 data-i18n="gameover">GAME OVER</h1>
-            <div style="background: var(--surface); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 20px;">
-                <h2 style="margin-bottom: 5px;"><span data-i18n="score">Punkte</span>: <span id="end-score">0</span></h2>
-                <div id="new-record-msg" style="color: var(--success); font-weight:bold; display:none;">NEW RECORD!</div>
-                <p style="margin:0; opacity:0.6;"><span data-i18n="hs">Highscore</span>: <span id="end-hs">0</span></p>
+        <div id="screen-result" class="screen" style="justify-content:center; text-align:center;">
+            <h1>GAME OVER</h1>
+            <div class="neo-box">
+                <p style="margin:0; font-weight:bold;">SCORE</p>
+                <h2 style="font-family: var(--font-head); font-size:4rem; margin:0;" id="end-score">0</h2>
+                <p>Highscore: <span id="end-hs">0</span></p>
             </div>
-            <p style="margin-bottom: 5px;" data-i18n="correct_was">Das war:</p>
-            <h3 id="correct-answer-name" style="margin-top:0; color: var(--accent); text-transform:uppercase;">Name</h3>
-            <button class="btn btn-primary" id="restart-btn" data-i18n="again">NOCHMAL</button>
-            <button class="btn" id="menu-btn" data-i18n="menu">MENÜ</button>
+            <p data-i18n="correct_was" style="font-weight:bold;">Das war:</p>
+            <h2 id="correct-answer-name" style="color:var(--accent); text-transform:uppercase; margin-top:0; -webkit-text-stroke: 1px var(--border);">Name</h2>
+            <button class="btn" style="background:var(--accent); width:100%; margin-bottom:15px;" id="restart-btn" data-i18n="again">NOCHMAL</button>
+            <button class="btn" style="width:100%;" id="menu-btn" data-i18n="menu">MENÜ</button>
+        </div>
+
+        <!-- LEARN -->
+        <div id="screen-learn" class="screen">
+            <div class="top-bar">
+                <span data-i18n="learn_title" style="font-family:var(--font-head);">ALLE FLAGGEN</span>
+                <button id="learn-back-btn" style="background:none; border:none; font-size:1.5rem; color:var(--text); cursor:pointer;">✕</button>
+            </div>
+            <div style="margin-bottom:15px; display:flex; gap:10px;">
+                <select id="study-region" class="neo-input-style"><option value="all">Welt</option><option value="Europe">Europa</option><option value="Asia">Asien</option><option value="Africa">Afrika</option><option value="Americas">Amerika</option></select>
+                <input type="text" id="study-search" placeholder="Suche...">
+            </div>
+            <div id="study-grid" class="study-grid"></div>
         </div>
     </div>
 
     <script>
-        // --- TRANSLATIONS ---
-        const i18n = {
-            de: {
-                hs: "Rekord", region: "Region", all: "Alle Welt", eur: "Europa", asia: "Asien", afr: "Afrika", ame: "Amerika",
-                mode: "Farbmodus", time: "Sichtbarkeit", start: "QUIZ STARTEN", learn: "LERNEN / ÜBERSICHT",
-                score: "Punkte", guess_label: "Land eingeben...", gameover: "GAME OVER", 
-                correct_was: "Richtig war:", again: "NOCHMAL", menu: "HAUPTMENÜ",
-                learn_title: "Alle Flaggen", search_ph: "Suchen..."
-            },
-            en: {
-                hs: "Highscore", region: "Region", all: "World", eur: "Europe", asia: "Asia", afr: "Africa", ame: "Americas",
-                mode: "Color Mode", time: "Visibility", start: "START QUIZ", learn: "STUDY / LIST",
-                score: "Score", guess_label: "Type country name...", gameover: "GAME OVER", 
-                correct_was: "It was:", again: "PLAY AGAIN", menu: "MAIN MENU",
-                learn_title: "All Flags", search_ph: "Search..."
+        // --- 1. SETTINGS & PERSISTENCE ---
+        let appState = { 
+            lang: localStorage.getItem('ff_lang') || 'de', 
+            data: [], pool: [], score: 0, lives: 3, 
+            currentLevelId: 'all', currentCountry: null, gameActive: false 
+        };
+
+        // Theme laden
+        const savedTheme = localStorage.getItem('ff_theme');
+        if(savedTheme === 'light') document.body.removeAttribute('data-theme'); // default is dark in HTML
+
+        // Zeit & Modus laden
+        const savedTime = localStorage.getItem('ff_time');
+        if(savedTime) $('opt-time').value = savedTime;
+        $('time-txt').innerText = parseFloat($('opt-time').value).toFixed(1) + 's';
+
+        const savedMode = localStorage.getItem('ff_mode');
+        if(savedMode) $('opt-mode').value = savedMode;
+
+        // --- 2. AUDIO ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.4);
+                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'milestone') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(659.25, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
             }
+        }
+
+        // --- 3. CONFIG ---
+        const i18n = {
+            de: { score: "SCORE", guess_label: "WELCHES LAND?", gameover: "GAME OVER", correct_was: "LÖSUNG:", again: "NOCHMAL", menu: "HAUPTMENÜ", learn_title: "LEXIKON" },
+            en: { score: "SCORE", guess_label: "WHICH COUNTRY?", gameover: "GAME OVER", correct_was: "ANSWER:", again: "PLAY AGAIN", menu: "MAIN MENU", learn_title: "LEXICON" }
         };
 
-        // --- STATE ---
-        let appState = {
-            lang: 'de',
-            data: [],
-            pool: [],
-            score: 0,
-            highscore: parseInt(localStorage.getItem('ff_highscore')) || 0,
-            currentCountry: null,
-            gameActive: false
-        };
+        const levelsConfig = [
+            { id: 'all', name_de: 'ALLE WELT', name_en: 'THE WORLD', region: 'all', rep: 'un' },
+            { id: 'eur', name_de: 'EUROPA', name_en: 'EUROPE', region: 'Europe', rep: 'de' },
+            { id: 'asia', name_de: 'ASIEN', name_en: 'ASIA', region: 'Asia', rep: 'jp' },
+            { id: 'afr', name_de: 'AFRIKA', name_en: 'AFRICA', region: 'Africa', rep: 'za' },
+            { id: 'ame', name_de: 'AMERIKA', name_en: 'AMERICAS', region: 'Americas', rep: 'ca' },
+            { id: 'oce', name_de: 'OZEANIEN', name_en: 'OCEANIA', region: 'Oceania', rep: 'au' }
+        ];
 
-        // --- DOM HELPER ---
-        const $ = (id) => document.getElementById(id);
+        function $(id) { return document.getElementById(id); }
         const screens = { menu: $('screen-menu'), game: $('screen-game'), result: $('screen-result'), learn: $('screen-learn') };
 
-        // --- INIT ---
+        // --- 4. INIT & OFFLINE DATA LOGIC ---
         async function init() {
-            $('menu-hs').innerText = appState.highscore;
             updateTexts();
+            
+            // PWA SW Register
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(console.error);
+            }
+
+            // 1. Versuche Daten aus LocalStorage zu laden (Offline Support)
+            const cachedData = localStorage.getItem('ff_data_cache');
+            if(cachedData) {
+                appState.data = JSON.parse(cachedData);
+                $('loading-msg').style.display = 'none';
+                renderLevelGrid();
+            }
+
+            // 2. Versuche im Hintergrund frische Daten zu holen
             try {
                 const res = await fetch("https://restcountries.com/v3.1/all?fields=name,flags,region,cca2,translations");
-                appState.data = await res.json();
+                const freshData = await res.json();
+                appState.data = freshData;
+                localStorage.setItem('ff_data_cache', JSON.stringify(freshData)); // Cache aktualisieren
                 $('loading-msg').style.display = 'none';
-            } catch (e) {
-                $('loading-msg').innerText = "Offline Modus aktiv (oder Fehler).";
+                renderLevelGrid();
+            } catch(e) {
+                if(!appState.data.length) $('loading-msg').innerText = "Offline & Keine Daten.";
             }
         }
 
-        // --- CORE FUNCTIONS ---
-        function switchScreen(name) {
-            Object.values(screens).forEach(s => s.classList.remove('active'));
-            screens[name].classList.add('active');
-        }
+        // --- LOGIC ---
+        function switchScreen(name) { Object.values(screens).forEach(s => s.classList.remove('active')); screens[name].classList.add('active'); }
 
         function updateTexts() {
             const dict = i18n[appState.lang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(dict[key]) el.innerText = dict[key];
+            document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = dict[el.getAttribute('data-i18n')]);
+            $('guess-input').placeholder = "???"; $('lang-btn').innerText = appState.lang.toUpperCase();
+        }
+        function getName(c) { return (appState.lang === 'de' && c.translations?.deu?.common) ? c.translations.deu.common : c.name.common; }
+
+        function renderLevelGrid() {
+            const grid = $('level-list'); grid.innerHTML = '';
+            levelsConfig.forEach(lvl => {
+                const card = document.createElement('div'); card.className = 'level-card'; card.onclick = () => startGame(lvl.id);
+                let imgUrl = lvl.id === 'all' ? "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Flag_of_the_United_Nations.svg/640px-Flag_of_the_United_Nations.svg.png" : appState.data.find(c => c.cca2.toLowerCase() === lvl.rep)?.flags.svg;
+                card.innerHTML = `<img src="${imgUrl}" class="level-icon"><div class="level-title">${appState.lang==='de'?lvl.name_de:lvl.name_en}</div>`;
+                grid.appendChild(card);
             });
-            $('guess-input').placeholder = dict.guess_label || "...";
-            $('study-search').placeholder = dict.search_ph || "...";
         }
 
-        function toggleLang() {
-            appState.lang = appState.lang === 'de' ? 'en' : 'de';
-            updateTexts();
-            // If in learn mode, re-render to update names
-            if(screens.learn.classList.contains('active')) renderStudy();
-        }
+        function startGame(levelId) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            appState.currentLevelId = levelId;
+            const lvl = levelsConfig.find(l => l.id === levelId);
+            appState.pool = lvl.region === 'all' ? [...appState.data] : appState.data.filter(c => c.region === lvl.region);
+            if(appState.pool.length === 0) return;
 
-        function getName(country) {
-            if(appState.lang === 'de' && country.translations && country.translations.deu) {
-                return country.translations.deu.common;
-            }
-            return country.name.common;
-        }
-
-        // --- GAME LOGIC ---
-        function startGame() {
-            if(appState.data.length === 0) return alert("Daten laden noch (oder Offline ohne Cache).");
-            const region = $('opt-region').value;
-            appState.pool = appState.data.filter(c => region === 'all' || c.region === region);
-            if(appState.pool.length === 0) return alert("Region leer.");
-
-            appState.score = 0;
-            $('game-score').innerText = "0";
-            appState.gameActive = true;
-
+            appState.score = 0; appState.lives = 3; appState.gameActive = true; updateLivesUI(); $('game-score').innerText = "0";
             const mode = $('opt-mode').value;
-            $('game-flag').className = 'flag-img'; 
-            if(mode === 'bw') $('game-flag').classList.add('bw');
-            if(mode === 'invert') $('game-flag').classList.add('inv');
-
-            // Setup Autocomplete
-            const datalist = $('country-list');
-            datalist.innerHTML = '';
-            appState.pool.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = getName(c);
-                datalist.appendChild(opt);
-            });
-
-            switchScreen('game');
-            nextRound();
+            $('game-flag').className = 'flag-img'; if(mode === 'bw') $('game-flag').classList.add('bw'); if(mode === 'invert') $('game-flag').classList.add('inv');
+            const dl = $('country-list'); dl.innerHTML = ''; appState.pool.forEach(c => { const opt = document.createElement('option'); opt.value = getName(c); dl.appendChild(opt); });
+            switchScreen('game'); nextRound();
         }
 
         function nextRound() {
-            $('input-container').classList.remove('visible');
-            $('guess-input').value = '';
-            $('game-flag').style.display = 'none';
-            $('timer-bar').style.transition = 'none';
-            $('timer-bar').style.transform = 'scaleX(1)';
-
-            const randIndex = Math.floor(Math.random() * appState.pool.length);
-            appState.currentCountry = appState.pool[randIndex];
-
-            $('game-msg').innerText = "Ready"; // Placeholder for loading
-            $('game-msg').style.display = 'block';
-            $('game-flag').src = appState.currentCountry.flags.svg;
-            
-            $('game-flag').onload = () => startCountdown();
-        }
-
-        function startCountdown() {
-            let count = 3;
-            $('game-msg').innerText = count;
-            const intv = setInterval(() => {
-                count--;
-                if(count > 0) $('game-msg').innerText = count;
-                else {
-                    clearInterval(intv);
-                    flashFlag();
-                }
-            }, 600);
+            $('input-container').classList.remove('visible'); $('guess-input').value = ''; $('game-flag').style.display = 'none';
+            $('timer-bar').style.transition = 'none'; $('timer-bar').style.transform = 'scaleX(1)';
+            appState.currentCountry = appState.pool[Math.floor(Math.random() * appState.pool.length)];
+            let count = 3; $('game-msg').innerText = count; $('game-msg').style.display = 'block'; $('game-flag').src = appState.currentCountry.flags.svg;
+            const intv = setInterval(() => { count--; if(count > 0) $('game-msg').innerText = count; else { clearInterval(intv); flashFlag(); } }, 600);
         }
 
         function flashFlag() {
-            $('game-msg').style.display = 'none';
-            $('game-flag').style.display = 'block';
+            $('game-msg').style.display = 'none'; $('game-flag').style.display = 'block';
             const time = parseFloat($('opt-time').value);
-            
-            setTimeout(() => {
-                $('timer-bar').style.transition = `transform ${time}s linear`;
-                $('timer-bar').style.transform = 'scaleX(0)';
-            }, 50);
-
-            setTimeout(() => {
-                $('game-flag').style.display = 'none';
-                showInput();
-            }, time * 1000);
-        }
-
-        function showInput() {
-            $('input-container').classList.add('visible');
-            $('guess-input').focus();
+            setTimeout(() => { $('timer-bar').style.transition = `transform ${time}s linear`; $('timer-bar').style.transform = 'scaleX(0)'; }, 50);
+            setTimeout(() => { $('game-flag').style.display = 'none'; $('input-container').classList.add('visible'); $('guess-input').focus(); }, time * 1000);
         }
 
         function submitGuess() {
             if(!appState.gameActive) return;
-            const userVal = $('guess-input').value.trim().toLowerCase();
-            const correctName = getName(appState.currentCountry).toLowerCase();
-
-            if(userVal === correctName) {
-                appState.score++;
-                $('game-score').innerText = appState.score;
+            const guess = $('guess-input').value.trim().toLowerCase();
+            const correct = getName(appState.currentCountry).toLowerCase();
+            if(guess === correct) {
+                appState.score++; $('game-score').innerText = appState.score;
+                if(appState.score > 0 && appState.score % 10 === 0) playSound('milestone');
                 nextRound();
             } else {
-                gameOver();
+                appState.lives--; updateLivesUI(); playSound('error');
+                if(appState.lives <= 0) gameOver(); else { alert(`Falsch! Lösung: ${getName(appState.currentCountry)}`); nextRound(); }
             }
         }
+
+        function updateLivesUI() { let s = ""; for(let i=0; i<3; i++) s += (i < appState.lives ? "❤️" : "🖤"); $('lives-display').innerText = s; }
 
         function gameOver() {
             appState.gameActive = false;
-            $('end-score').innerText = appState.score;
-            $('correct-answer-name').innerText = getName(appState.currentCountry);
-            
-            let newRecord = false;
-            if(appState.score > appState.highscore) {
-                appState.highscore = appState.score;
-                localStorage.setItem('ff_highscore', appState.highscore);
-                newRecord = true;
-            }
-            $('end-hs').innerText = appState.highscore;
-            $('menu-hs').innerText = appState.highscore;
-            $('new-record-msg').style.display = newRecord ? 'block' : 'none';
+            const key = `hs_${appState.currentLevelId}`; const old = parseInt(localStorage.getItem(key)) || 0;
+            if(appState.score > old) localStorage.setItem(key, appState.score);
+            $('end-score').innerText = appState.score; $('end-hs').innerText = Math.max(old, appState.score); $('correct-answer-name').innerText = getName(appState.currentCountry);
             switchScreen('result');
         }
 
-        // --- STUDY MODE LOGIC ---
-        function openStudy() {
-            if(appState.data.length === 0) return alert("Daten noch nicht geladen.");
-            switchScreen('learn');
-            renderStudy();
-        }
-
         function renderStudy() {
-            const grid = $('study-grid');
-            grid.innerHTML = '';
-            
-            const region = $('study-region-select').value;
-            const search = $('study-search').value.toLowerCase();
-
-            // Filter
-            const list = appState.data.filter(c => {
-                const name = getName(c).toLowerCase();
-                const matchesRegion = (region === 'all' || c.region === region);
-                const matchesSearch = name.includes(search);
-                return matchesRegion && matchesSearch;
-            });
-            
-            // Sort A-Z
-            list.sort((a, b) => getName(a).localeCompare(getName(b)));
-
-            // Render
-            // Performance Tip: Creating Fragment
+            const grid = $('study-grid'); grid.innerHTML = '';
+            const region = $('study-region').value; const search = $('study-search').value.toLowerCase();
+            let list = appState.data.filter(c => (region === 'all' || c.region === region) && getName(c).toLowerCase().includes(search));
+            list.sort((a,b) => getName(a).localeCompare(getName(b)));
             const frag = document.createDocumentFragment();
-            list.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'study-card';
-                
-                const img = document.createElement('img');
-                img.loading = 'lazy'; // Important for performance!
-                img.src = c.flags.svg;
-                
-                const span = document.createElement('span');
-                span.innerText = getName(c);
-
-                div.appendChild(img);
-                div.appendChild(span);
-                frag.appendChild(div);
-            });
+            list.forEach(c => { const div = document.createElement('div'); div.className = 'study-card'; div.innerHTML = `<img loading="lazy" src="${c.flags.svg}"><span>${getName(c)}</span>`; frag.appendChild(div); });
             grid.appendChild(frag);
         }
 
-        // --- EVENT BINDINGS ---
-        $('lang-btn').onclick = toggleLang;
-        $('theme-btn').onclick = () => {
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+        // --- EVENTS & SAVING ---
+        $('lang-btn').onclick = () => { 
+            appState.lang = appState.lang === 'de' ? 'en' : 'de'; 
+            localStorage.setItem('ff_lang', appState.lang);
+            updateTexts(); renderLevelGrid(); 
         };
-        $('opt-time').oninput = (e) => $('time-display').innerText = parseFloat(e.target.value).toFixed(1);
+        $('theme-btn').onclick = () => { 
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? '' : 'dark');
+            localStorage.setItem('ff_theme', isDark ? 'light' : 'dark');
+        };
+        $('opt-time').oninput = (e) => {
+            $('time-txt').innerText = parseFloat(e.target.value).toFixed(1) + 's';
+        };
+        $('opt-time').onchange = (e) => localStorage.setItem('ff_time', e.target.value);
+        $('opt-mode').onchange = (e) => localStorage.setItem('ff_mode', e.target.value);
 
-        $('start-btn').onclick = startGame;
-        $('restart-btn').onclick = startGame;
-        $('menu-btn').onclick = () => switchScreen('menu');
-        $('quit-btn').onclick = () => switchScreen('menu');
-
-        // Game Input
-        $('submit-btn').onclick = submitGuess;
-        $('guess-input').addEventListener("keypress", (e) => { if (e.key === "Enter") submitGuess(); });
-
-        // Learn Mode
-        $('learn-btn').onclick = openStudy;
+        $('restart-btn').onclick = () => startGame(appState.currentLevelId);
+        $('menu-btn').onclick = () => switchScreen('menu'); $('quit-btn').onclick = () => switchScreen('menu');
+        $('open-learn-btn').onclick = () => { if(appState.data.length) { switchScreen('learn'); renderStudy(); }};
         $('learn-back-btn').onclick = () => switchScreen('menu');
-        $('study-region-select').onchange = renderStudy;
-        $('study-search').oninput = renderStudy;
+        $('study-region').onchange = renderStudy; $('study-search').oninput = renderStudy;
+        $('submit-btn').onclick = submitGuess; $('guess-input').addEventListener("keypress", (e) => { if(e.key==="Enter") submitGuess(); });
 
-        // PWA Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
-            });
-        }
-
-        // Start
         init();
     </script>
 </body>
